@@ -20,7 +20,8 @@ export async function load({ platform }) {
 			id: '10b1ca42e1a8800caab2e6a73c3c11d0'
 		});
 	};
-	const page = cachedValue ? ((await cachedValue.json()) as PageWithBlocks) : await getFromOrigin();
+	const page = await getFromOrigin();
+	// const page = cachedValue ? ((await cachedValue.json()) as PageWithBlocks) : await getFromOrigin();
 
 	if (isStale || !cachedValue) {
 		platform?.context.waitUntil(
