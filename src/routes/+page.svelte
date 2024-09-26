@@ -10,35 +10,39 @@
 	}
 </script>
 
-<NotionPage page={data.page}>
-	{#snippet marks({ mark, children })}
-		{#if mark.bold}
-			<strong>
-				{@render children()}
-			</strong>
-		{:else if mark.italic}
-			<em>
-				{@render children()}
-			</em>
-		{:else if mark.strikethrough}
-			<s>
-				{@render children()}
-			</s>
-		{:else if mark.underline}
-			<u>
-				{@render children()}
-			</u>
-		{:else if mark.code}
-			<code>
-				{@render children()}
-			</code>
-		{:else if mark.color}
-			<span style="color: {mark.color}">
-				{@render children()}
-			</span>
-		{/if}
-	{/snippet}
-</NotionPage>
+{#if data.page}
+	<NotionPage page={data.page}>
+		{#snippet marks({ mark, children })}
+			{#if mark.bold}
+				<strong>
+					{@render children()}
+				</strong>
+			{:else if mark.italic}
+				<em>
+					{@render children()}
+				</em>
+			{:else if mark.strikethrough}
+				<s>
+					{@render children()}
+				</s>
+			{:else if mark.underline}
+				<u>
+					{@render children()}
+				</u>
+			{:else if mark.code}
+				<code>
+					{@render children()}
+				</code>
+			{:else if mark.color}
+				<span style="color: {mark.color}">
+					{@render children()}
+				</span>
+			{/if}
+		{/snippet}
+	</NotionPage>
+{:else}
+	no data
+{/if}
 
 <style>
 	code {
