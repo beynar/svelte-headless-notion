@@ -12,6 +12,8 @@ export async function load({ platform }) {
 		};
 	}
 
+	console.log({ isStale, cachedValue });
+
 	const getFromOrigin = async () => {
 		return getPage({
 			auth: PRIVATE_NOTION_TOKEN,
@@ -32,7 +34,6 @@ export async function load({ platform }) {
 						}
 					})
 				);
-
 				resolve(true);
 			})
 		);
