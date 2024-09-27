@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-
 	import '$lib/notion-blocks.css';
 	import NotionPage from '$lib/Page.svelte';
 
