@@ -29,7 +29,7 @@ export async function load({ platform }) {
 
 	const page = cachedValue?.value || (await getFromOrigin());
 
-	if (isStale || !cachedValue) {
+	if (isStale || !cachedValue?.value) {
 		platform?.context.waitUntil(setInCache(platform, page));
 	}
 	console.log({ cachedValue, isStale });
