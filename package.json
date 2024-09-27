@@ -1,6 +1,6 @@
 {
-	"name": "svelte-notion",
-	"version": "0.0.1",
+	"name": "svelte-headless-notion",
+	"version": "0.0.2",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -17,8 +17,19 @@
 	},
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
+			"types": "./dist/Page.svelte.d.ts",
+			"svelte": "./dist/Page.svelte",
+			"default": "./dist/Page.svelte"
+		},
+		"./Text": {
+			"types": "./dist/Text.svelte.d.ts",
+			"svelte": "./dist/Text.svelte",
+			"default": "./dist/Text.svelte"
+		},
+		"./server": {
+			"types": "./dist/server.d.ts",
+			"svelte": "./dist/server.js",
+			"default": "./dist/server.js"
 		}
 	},
 	"files": [
@@ -53,7 +64,18 @@
 		"vite": "^5.0.11",
 		"vitest": "^2.0.0"
 	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"svelte": "./dist/Page.svelte.d.ts",
+	"types": "./dist/Page.svelte.d.ts",
+	"typesVersion": {
+		"*": {
+			".": "./dist/Page.svelte.d.ts"
+		},
+		"./Text": {
+			".": "./dist/Text.svelte.d.ts"
+		},
+		"./server": {
+			".": "./dist/server.d.ts"
+		}
+	},
 	"type": "module"
 }

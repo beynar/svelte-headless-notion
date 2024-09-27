@@ -176,7 +176,7 @@ type LastEditedBy = BaseProperty<
 
 type Unknown = BaseProperty<'unknown', {}>;
 
-type NotionProperty =
+export type Property =
 	| Title
 	| RichTextProperty
 	| Number
@@ -198,7 +198,7 @@ type NotionProperty =
 	| LastEditedBy
 	| Unknown;
 
-export type NotionProperties = NotionProperty[];
+export type Properties = Property[];
 export type PageWithProperties = {
 	title: RichText;
 	cover?: string;
@@ -209,7 +209,7 @@ export type PageWithProperties = {
 	created_time: string;
 	last_edited_time: string;
 	parent: string;
-	properties: NotionProperties;
+	properties: Properties;
 };
 
 export const sanitizePageProperties = async (
@@ -218,7 +218,7 @@ export const sanitizePageProperties = async (
 ): Promise<PageWithProperties> => {
 	const entries = Object.entries(page.properties);
 	const properties = await Promise.all(
-		entries.map(async ([key, value]): Promise<NotionProperty> => {
+		entries.map(async ([key, value]): Promise<Property> => {
 			switch (value.type) {
 				default:
 					return {

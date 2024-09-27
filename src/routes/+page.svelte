@@ -10,49 +10,35 @@
 	}
 </script>
 
-{#if data.page && 'blocks' in data.page}
-	<NotionPage page={data.page}>
-		{#snippet marks({ mark, children })}
-			{#if mark.bold}
-				<strong>
-					{@render children()}
-				</strong>
-			{:else if mark.italic}
-				<em>
-					{@render children()}
-				</em>
-			{:else if mark.strikethrough}
-				<s>
-					{@render children()}
-				</s>
-			{:else if mark.underline}
-				<u>
-					{@render children()}
-				</u>
-			{:else if mark.code}
-				<code>
-					{@render children()}
-				</code>
-			{:else if mark.color}
-				<span style="color: {mark.color}">
-					{@render children()}
-				</span>
-			{/if}
-		{/snippet}
-	</NotionPage>
-{:else}
-	no data
-{/if}
-
-<style>
-	code {
-		font-size: 0.9rem;
-		background-color: #ededed;
-		/* padding: 0.1rem 0.2rem; */
-		border-radius: 0.2rem;
-	}
-	:global(code + code) {
-		padding-left: 10px;
-		padding-right: 10px;
-	}
-</style>
+<NotionPage page={data.page}>
+	{#snippet bold({ children })}
+		<strong>
+			{@render children()}
+		</strong>
+	{/snippet}
+	{#snippet italic({ children })}
+		<em>
+			{@render children()}
+		</em>
+	{/snippet}
+	{#snippet strikethrough({ children })}
+		<s>
+			{@render children()}
+		</s>
+	{/snippet}
+	{#snippet underline({ children })}
+		<u>
+			{@render children()}
+		</u>
+	{/snippet}
+	{#snippet inlineCode({ children })}
+		<u>
+			{@render children()}
+		</u>
+	{/snippet}
+	{#snippet color({ children, color })}
+		<span style="color: var(--notion-{color})">
+			{@render children()}
+		</span>
+	{/snippet}
+</NotionPage>

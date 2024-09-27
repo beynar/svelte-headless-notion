@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Block } from './block.js';
-	import NotionText from './Text.svelte';
-	import NotionBlocks from './Blocks.svelte';
+	import Text from './Text.svelte';
+	import Blocks from './Blocks.svelte';
 	import { getPageContext } from './Page.svelte';
 
 	const { blocks }: { blocks: Block[] } = $props();
@@ -268,18 +268,18 @@
 	{@const captionText = 'caption' in block ? block.caption : undefined}
 	{#snippet content()}
 		{#if contentText}
-			<NotionText content={contentText} />
+			<Text content={contentText} />
 		{/if}
 	{/snippet}
 	{#snippet children()}
 		{#if childrenBlocks}
-			<NotionBlocks blocks={childrenBlocks} />
+			<Blocks blocks={childrenBlocks} />
 		{/if}
 	{/snippet}
 
 	{#snippet caption()}
 		{#if captionText}
-			<NotionText content={captionText} />
+			<Text content={captionText} />
 		{/if}
 	{/snippet}
 

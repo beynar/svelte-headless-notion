@@ -2,6 +2,7 @@
 	import { getContext, setContext, type Snippet } from 'svelte';
 	import type { PageWithBlocks } from './server.js';
 	import type { Colors, Link, Mark, Mention } from './richtext.js';
+	import type { Property, Properties, PageWithProperties } from './properties.js';
 	import {
 		type BulletedListItemBlock,
 		type HeadingBlock,
@@ -55,10 +56,7 @@
 				caption: CAPTION extends true ? Snippet : never;
 				content: CONTENT extends true ? Snippet : never;
 				children: CHILDREN extends true ? Snippet : never;
-			}> &
-				PROPS extends never
-				? never
-				: PROPS
+			}>
 		]
 	>;
 
@@ -111,6 +109,49 @@
 		snippets: PageSnippets;
 	};
 
+	export type {
+		Colors,
+		BulletedListItemBlock,
+		HeadingBlock,
+		ParagraphBlock,
+		NumberedListItemBlock,
+		ToDoBlock,
+		ToggleBlock,
+		CalloutBlock,
+		QuoteBlock,
+		CodeBlock,
+		EmbedBlock,
+		ImageBlock,
+		VideoBlock,
+		FileBlock,
+		PdfBlock,
+		AudioBlock,
+		BookmarkBlock,
+		ChildDatabaseBlock,
+		EquationBlock,
+		DividerBlock,
+		LinkPreviewBlock,
+		TableBlock,
+		TableRowBlock,
+		TableCellBlock,
+		TableOfContentsBlock,
+		BreadcrumbBlock,
+		ColumnListBlock,
+		ColumnBlock,
+		SyncedBlock,
+		TemplateBlock,
+		LinkToPageBlock,
+		UnsupportedBlock,
+		ChildPageBlock,
+		Block,
+		Link,
+		Mark,
+		Mention,
+		Property,
+		Properties,
+		PageWithProperties
+	};
+
 	export const registerPage = (context: PageContext) => {
 		setContext('page', context);
 	};
@@ -121,18 +162,38 @@
 </script>
 
 <script lang="ts">
-	import NotionBlocks from './Blocks.svelte';
+	import Blocks from './Blocks.svelte';
+	import Text from './Text.svelte';
 
 	const {
+		as = 'article',
+		class: className = '',
+		header,
+		footer,
 		page,
 		...snippets
 	}: {
+		class?: string;
+		as?: string;
+		header?: Snippet<[{ page: PageWithBlocks }]>;
+		footer?: Snippet<[{ page: PageWithBlocks }]>;
 		page: PageWithBlocks;
 	} & PageSnippets = $props();
 
 	registerPage({ page, snippets });
 </script>
 
-<div data-sn-page>
-	<NotionBlocks blocks={page.blocks} />
-</div>
+<svelte:element this={as} data-sn-page class={className}>
+	{#if header}
+		{@render header({ page })}
+	{:else}
+		<img src={page.cover} alt="" style="width: 100%; height: 300px; object-fit: cover;" />
+		<h1 data-sn-page-title>
+			<Text content={page.title} />
+		</h1>
+	{/if}
+	<Blocks blocks={page.blocks} />
+	{#if footer}
+		{@render footer({ page })}
+	{/if}
+</svelte:element>

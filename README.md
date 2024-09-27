@@ -6,7 +6,7 @@ Simply fetch a page and render it as you want with snippets.
 ## Install
 
 ```bash
-npm install svelte-notion
+npm install svelte-headless-notion
 ```
 
 ## Prerequisites
@@ -18,7 +18,7 @@ npm install svelte-notion
 
 ```ts
 // src/routes/+page.server.ts
-import { getPage } from 'svelte-notion/server';
+import { getPage } from 'svelte-headless-notion/server';
 
 export const load = async () => {
 	// This very slow you will obsiously want to chache it somewhere and make a custom SWR logic.
@@ -34,13 +34,13 @@ export const load = async () => {
 ```
 
 ```svelte
+<!--  src/routes/+page.svelte -->
 <script lang="ts">
-	import Page from 'svele-notion';
-	let { page } = $props();
+	import Page from 'svelte-headless-notion';
+	let { data } = $props();
 </script>
 
-// src/routes/+page.svelte
-<Page {page}>
+<Page page={data.data}>
 	{#snippet paragraph({ block, children, content })}
 		<div>
 			<p>
@@ -49,8 +49,7 @@ export const load = async () => {
 			{@render children()}
 		</div>
 	{/snippet}
-
-	<!-- Define other snippets here -->
+	<!-- Define other block snippet here -->
 </Page>
 ```
 

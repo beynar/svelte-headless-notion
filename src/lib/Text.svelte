@@ -1,5 +1,5 @@
 <script lang="ts">
-	import NotionMarks from './Marks.svelte';
+	import Marks from './Marks.svelte';
 	import { getPageContext } from './Page.svelte';
 	import type { RichText, Text, Link, Mention } from './richtext.js';
 	import { type Snippet } from 'svelte';
@@ -14,7 +14,7 @@
 
 {#snippet marks({ textPart }: { textPart: Text | Link | Mention })}
 	{#if textPart.marks.length > 0}
-		<NotionMarks
+		<Marks
 			index={0}
 			content={textPart.text}
 			mark={textPart.marks[0]}
