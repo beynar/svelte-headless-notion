@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	import { getContext, setContext, type Snippet } from 'svelte';
 	import type { PageWithBlocks } from './server.js';
-	import type { Link, Mark, Mention } from './richtext.js';
+	import type { Colors, Link, Mark, Mention } from './richtext.js';
 	import {
 		type BulletedListItemBlock,
 		type HeadingBlock,
@@ -55,7 +55,10 @@
 				caption: CAPTION extends true ? Snippet : never;
 				content: CONTENT extends true ? Snippet : never;
 				children: CHILDREN extends true ? Snippet : never;
-			}>
+			}> &
+				PROPS extends never
+				? never
+				: PROPS
 		]
 	>;
 
@@ -78,7 +81,7 @@
 		bookmark: BlockSnippet<BookmarkBlock, false, false, true>;
 		child_page: BlockSnippet<ChildPageBlock>;
 		child_database: BlockSnippet<ChildDatabaseBlock>;
-		equation: BlockSnippet<EquationBlock>;
+		equation: BlockSnippet<EquationBlock, false, false, false>;
 		divider: BlockSnippet<DividerBlock>;
 		table: BlockSnippet<TableBlock, true>;
 		table_row: BlockSnippet<TableRowBlock, true>;
@@ -95,6 +98,12 @@
 		link: Snippet<[{ block: Link; children: Snippet }]>;
 		mention: Snippet<[{ block: Mention; children: Snippet }]>;
 		marks: Snippet<[{ mark: Mark; children: Snippet }]>;
+		bold: Snippet<[{ children: Snippet }]>;
+		italic: Snippet<[{ children: Snippet }]>;
+		strikethrough: Snippet<[{ children: Snippet }]>;
+		underline: Snippet<[{ children: Snippet }]>;
+		inlineCode: Snippet<[{ children: Snippet }]>;
+		color: Snippet<[{ children: Snippet; color: Colors }]>;
 	}>;
 
 	export type PageContext = {

@@ -1,5 +1,5 @@
 import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints.js';
-type Colors =
+export type Colors =
 	| 'blue'
 	| 'blue_background'
 	| 'brown'
