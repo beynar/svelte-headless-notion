@@ -1,8 +1,9 @@
-import { type Block, type RawBlock, sanitizeBlock } from './block.js';
+import { type Block, type RawBlock, sanitizeBlocks } from './block.js';
 
 import type {
 	BlockObjectResponse,
 	PageObjectResponse,
+	QueryDatabaseParameters,
 	UserObjectResponse
 } from '@notionhq/client/build/src/api-endpoints.js';
 import { sanitizePageProperties, type PageWithProperties } from './properties.js';
@@ -50,12 +51,10 @@ export class Notion {
 	};
 
 	getPageContent = (block_id: string) => {
-		return this.getRecursiveBlocks(block_id).then((blocks) => {
-			return blocks.reduce(sanitizeBlock, []);
-		});
+		return this.getRecursiveBlocks(block_id).then(sanitizeBlocks);
 	};
 
-	getDatabasePages = (database_id: string) => {
+	getDatabasePages = (database_id: string, filter?: QueryDatabaseParameters['filter']) => {
 		return fetch(`https://api.notion.com/v1/databases/${database_id}/query`, {
 			method: 'POST',
 			headers: Object.assign(
@@ -65,10 +64,12 @@ export class Notion {
 				this.headers
 			),
 			body: JSON.stringify({
-				page_size: 100
+				page_size: 100,
+				filter
 			})
 		}).then((response) => {
 			return response.json().then((data: { results: PageObjectResponse[] }) => {
+				console.log(data);
 				return Promise.all((data?.results || []).map((page) => sanitizePageProperties(page, this)));
 			});
 		});
@@ -100,4 +101,22 @@ export const getPage = async ({
 	return Promise.all([notion.getPage(id), notion.getPageContent(id)]).then(([page, blocks]) => {
 		return Object.assign(page, { blocks });
 	});
+};
+export const findPage = async ({
+	auth,
+	database_id,
+	filter
+}: {
+	auth: string;
+	database_id: string;
+	filter?: QueryDatabaseParameters['filter'];
+}) => {
+	const notion = new Notion(auth);
+	const [page] = (await notion.getDatabasePages(database_id, filter)) || [];
+
+	if (!page) {
+		return null;
+	}
+	const blocks = await notion.getPageContent(page.id);
+	return Object.assign(page, { blocks });
 };

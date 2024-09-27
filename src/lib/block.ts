@@ -1,6 +1,7 @@
 import type {
 	BlockObjectResponse,
-	CodeBlockObjectResponse
+	CodeBlockObjectResponse,
+	TableBlockObjectResponse
 } from '@notionhq/client/build/src/api-endpoints.js';
 import { sanitizeRichText, type RichText } from './richtext.js';
 import type { PageWithProperties } from './properties.js';
@@ -25,96 +26,84 @@ export type Color =
 	| 'pink_background'
 	| 'red_background';
 
-export type BaseTextBlock = {
+export type TextualBlock = {
 	color?: Color;
 	content: RichText;
 	children: Block[];
 };
 
-export type ParagraphBlock = BaseTextBlock & {
+export type ParagraphBlock = TextualBlock & {
 	type: 'paragraph';
 };
 
-export type HeadingBlock = Omit<BaseTextBlock, 'children'> & {
-	level: 1 | 2 | 3 | 4 | 5 | 6;
-	type: 'heading';
+export type HeadingBlock = Omit<TextualBlock, 'children'> & {
+	type: 'heading_1' | 'heading_2' | 'heading_3';
 	toggleable?: boolean;
 	isOpen?: boolean;
 };
 
-export type BulletedListItemBlock = BaseTextBlock & {
+export type BulletedListItemBlock = TextualBlock & {
 	type: 'bulleted_list_item';
 };
 
-export type NumberedListItemBlock = BaseTextBlock & {
+export type NumberedListItemBlock = TextualBlock & {
 	type: 'numbered_list_item';
 };
 
-export type ToDoBlock = BaseTextBlock & {
+export type ToDoBlock = TextualBlock & {
 	type: 'to_do';
 	checked?: boolean;
 };
 
-export type ToggleBlock = BaseTextBlock & {
+export type ToggleBlock = TextualBlock & {
 	type: 'toggle';
 	isOpen?: boolean;
 };
-export type CodeLanguage = CodeBlockObjectResponse['code']['language'];
 
-export type CalloutBlock = BaseTextBlock & {
+export type CalloutBlock = TextualBlock & {
 	type: 'callout';
 	// icon?: EmojiObject | FileObject;
 	icon?: any;
 };
 
-export type QuoteBlock = BaseTextBlock & {
+export type QuoteBlock = TextualBlock & {
 	type: 'quote';
 };
 
-export type ChildPageBlock = {
-	type: 'child_page';
-	title: string;
-};
-export type CodeBlock = Omit<BaseTextBlock, 'color'> & {
+export type CodeLanguage = CodeBlockObjectResponse['code']['language'];
+export type CodeBlock = Omit<TextualBlock, 'color'> & {
 	type: 'code';
-
 	language?: CodeLanguage;
 	caption: RichText;
 };
 
-export type ChildDatabaseBlock = {
-	type: 'child_database';
-	pages: PageWithProperties[];
-	title?: string;
-};
-
-export type BaseMediaBlock = {
+export type MediaBlock = {
 	url: string;
 	caption: RichText;
 };
 
-export type EmbedBlock = BaseMediaBlock & {
+export type EmbedBlock = MediaBlock & {
 	type: 'embed';
 };
-export type ImageBlock = BaseMediaBlock & {
+export type ImageBlock = MediaBlock & {
 	type: 'image';
 };
 
-export type VideoBlock = BaseMediaBlock & {
+export type VideoBlock = MediaBlock & {
 	type: 'video';
 };
 
-export type FileBlock = BaseMediaBlock & {
+export type FileBlock = MediaBlock & {
 	type: 'file';
 };
-export type PdfBlock = BaseMediaBlock & {
+export type PdfBlock = MediaBlock & {
 	type: 'pdf';
 };
-export type AudioBlock = BaseMediaBlock & {
+export type AudioBlock = MediaBlock & {
 	type: 'audio';
 };
 
-export type BookmarkBlock = BaseMediaBlock & {
+export type BookmarkBlock = MediaBlock & {
 	type: 'bookmark';
 };
 
@@ -179,6 +168,7 @@ export type TableRowBlock = {
 export type TableCellBlock = {
 	type: 'table_cell';
 	rowSpan: number;
+	isHeader: boolean;
 	colSpan: number;
 	content: RichText;
 };
@@ -189,6 +179,16 @@ export type LinkPreviewBlock = {
 };
 export type UnsupportedBlock = {
 	type: 'unsupported';
+};
+
+export type ChildPageBlock = {
+	type: 'child_page';
+	title: string;
+};
+export type ChildDatabaseBlock = {
+	type: 'child_database';
+	title?: string;
+	pages: PageWithProperties[];
 };
 
 export type Block =
@@ -235,8 +235,9 @@ const removeColor = (block: Block) => {
 	}
 	return block;
 };
-
-const extractBlock = (block: RawBlock): Block => {
+type o = RawBlock['type'];
+//
+const extractBlock = (block: RawBlock, parent?: RawBlock, blockIndex?: number): Block => {
 	switch (block.type) {
 		default: {
 			return {
@@ -248,15 +249,15 @@ const extractBlock = (block: RawBlock): Block => {
 			return {
 				type: 'paragraph',
 				content: sanitizeRichText(block.paragraph.rich_text),
-				children: block.children.reduce(sanitizeBlock, []),
+				children: sanitizeBlocks(block.children, block),
 				color: block.paragraph.color
 			} satisfies ParagraphBlock;
 		}
 
 		case 'heading_1': {
 			return {
-				type: 'heading',
-				level: 1,
+				type: 'heading_1',
+
 				content: sanitizeRichText(block.heading_1.rich_text),
 				toggleable: block.heading_1.is_toggleable,
 				isOpen: false,
@@ -266,8 +267,7 @@ const extractBlock = (block: RawBlock): Block => {
 
 		case 'heading_2': {
 			return {
-				type: 'heading',
-				level: 2,
+				type: 'heading_2',
 				content: sanitizeRichText(block.heading_2.rich_text),
 				toggleable: block.heading_2.is_toggleable,
 				isOpen: false,
@@ -276,8 +276,8 @@ const extractBlock = (block: RawBlock): Block => {
 		}
 		case 'heading_3': {
 			return {
-				type: 'heading',
-				level: 3,
+				type: 'heading_3',
+
 				content: sanitizeRichText(block.heading_3.rich_text),
 				toggleable: block.heading_3.is_toggleable,
 				isOpen: false,
@@ -290,7 +290,7 @@ const extractBlock = (block: RawBlock): Block => {
 				type: 'bulleted_list_item',
 				content: sanitizeRichText(block.bulleted_list_item.rich_text),
 				color: block.bulleted_list_item.color,
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies BulletedListItemBlock;
 		}
 		case 'numbered_list_item': {
@@ -298,7 +298,7 @@ const extractBlock = (block: RawBlock): Block => {
 				type: 'numbered_list_item',
 				content: sanitizeRichText(block.numbered_list_item.rich_text),
 				color: block.numbered_list_item.color,
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies NumberedListItemBlock;
 		}
 		case 'to_do': {
@@ -307,7 +307,7 @@ const extractBlock = (block: RawBlock): Block => {
 				content: sanitizeRichText(block.to_do.rich_text),
 				color: block.to_do.color,
 				checked: block.to_do.checked,
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies ToDoBlock;
 		}
 		case 'toggle': {
@@ -316,19 +316,19 @@ const extractBlock = (block: RawBlock): Block => {
 				content: sanitizeRichText(block.toggle.rich_text),
 				color: block.toggle.color,
 				isOpen: false,
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies ToggleBlock;
 		}
 		case 'column': {
 			return {
 				type: 'column',
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies ColumnBlock;
 		}
 		case 'column_list': {
 			return {
 				type: 'column_list',
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies ColumnListBlock;
 		}
 		case 'code': {
@@ -337,7 +337,7 @@ const extractBlock = (block: RawBlock): Block => {
 				language: block.code.language,
 				content: sanitizeRichText(block.code.rich_text),
 				caption: sanitizeRichText(block.code.caption),
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies CodeBlock;
 		}
 		case 'callout': {
@@ -346,7 +346,7 @@ const extractBlock = (block: RawBlock): Block => {
 				content: sanitizeRichText(block.callout.rich_text),
 				color: block.callout.color,
 				icon: block.callout.icon,
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies CalloutBlock;
 		}
 		case 'quote': {
@@ -354,7 +354,7 @@ const extractBlock = (block: RawBlock): Block => {
 				type: 'quote',
 				content: sanitizeRichText(block.quote.rich_text),
 				color: block.quote.color,
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies QuoteBlock;
 		}
 		case 'bookmark': {
@@ -423,14 +423,14 @@ const extractBlock = (block: RawBlock): Block => {
 		case 'synced_block': {
 			return {
 				type: 'synced_block',
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies SyncedBlock;
 		}
 		case 'template': {
 			return {
 				type: 'template',
 				content: sanitizeRichText(block.template.rich_text),
-				children: block.children.reduce(sanitizeBlock, [])
+				children: sanitizeBlocks(block.children)
 			} satisfies TemplateBlock;
 		}
 		case 'link_preview': {
@@ -445,15 +445,19 @@ const extractBlock = (block: RawBlock): Block => {
 				table_width: block.table.table_width,
 				has_column_header: block.table.has_column_header,
 				has_row_header: block.table.has_row_header,
-				children: block.children.reduce(sanitizeBlock, []) as TableRowBlock[]
+				children: sanitizeBlocks(block.children, block)
 			} satisfies TableBlock;
 		}
 		case 'table_row': {
+			const parentTable = parent as TableBlockObjectResponse;
+			const hasColumnHeader = parentTable?.table?.has_column_header;
+			const hasRowHeader = parentTable?.table?.has_row_header;
 			return {
 				type: 'table_row',
-				children: block.table_row.cells.map((cells) => {
+				children: block.table_row.cells.map((cells, index) => {
 					return {
 						type: 'table_cell',
+						isHeader: (blockIndex === 0 && hasColumnHeader) || (hasRowHeader && index === 0),
 						content: sanitizeRichText(cells),
 						rowSpan: 1,
 						colSpan: 1
@@ -501,33 +505,29 @@ const extractBlock = (block: RawBlock): Block => {
 	}
 };
 
-export const sanitizeBlock = (
-	acc: Block[],
-	block: RawBlock,
-	index: number,
-	array: RawBlock[]
-): Block[] => {
-	const sanitizedBlock = removeColor(extractBlock(block));
-	// remove trailing paragraph
-	if (
-		sanitizedBlock.type === 'paragraph' &&
-		sanitizedBlock.content?.length === 0 &&
-		sanitizedBlock.children?.length === 0 &&
-		index === array.length - 1
-	) {
-		let previousIndex = index - 1;
-		let previousBlock = acc[index - 1];
-		while (
-			previousBlock.type === 'paragraph' &&
-			previousBlock.content?.length === 0 &&
-			previousBlock.children?.length === 0
+export const sanitizeBlocks = (children: RawBlock[] = [], parent?: RawBlock) =>
+	children.reduce((acc: Block[], block: RawBlock, index: number, array: RawBlock[]): Block[] => {
+		const sanitizedBlock = removeColor(extractBlock(block, parent, index));
+		// remove trailing paragraph
+		if (
+			sanitizedBlock.type === 'paragraph' &&
+			sanitizedBlock.content?.length === 0 &&
+			sanitizedBlock.children?.length === 0 &&
+			index === array.length - 1
 		) {
-			previousIndex -= 1;
-			previousBlock = acc[previousIndex];
-			acc.pop();
+			let previousIndex = index - 1;
+			let previousBlock = acc[index - 1];
+			while (
+				previousBlock.type === 'paragraph' &&
+				previousBlock.content?.length === 0 &&
+				previousBlock.children?.length === 0
+			) {
+				previousIndex -= 1;
+				previousBlock = acc[previousIndex];
+				acc.pop();
+			}
+			return acc;
 		}
+		acc.push(sanitizedBlock);
 		return acc;
-	}
-	acc.push(sanitizedBlock);
-	return acc;
-};
+	}, [] as Block[]);

@@ -62,7 +62,9 @@
 
 	export type PageSnippets = Partial<{
 		paragraph: BlockSnippet<ParagraphBlock, true, true>;
-		heading: BlockSnippet<HeadingBlock, true, true>;
+		heading_1: BlockSnippet<HeadingBlock, true, true>;
+		heading_2: BlockSnippet<HeadingBlock, true, true>;
+		heading_3: BlockSnippet<HeadingBlock, true, true>;
 		bulleted_list_item: BlockSnippet<BulletedListItemBlock, true, true>;
 		numbered_list_item: BlockSnippet<NumberedListItemBlock, true, true>;
 		to_do: BlockSnippet<ToDoBlock, true, true>;

@@ -200,6 +200,7 @@ export type Property =
 
 export type Properties = Property[];
 export type PageWithProperties = {
+	id: string;
 	title: RichText;
 	cover?: string;
 	icon?: {
@@ -388,6 +389,7 @@ export const sanitizePageProperties = async (
 	);
 
 	return {
+		id: page.id,
 		title: properties.find((property) => property.type === 'title')!.content,
 		cover: page.cover?.type === 'external' ? page.cover.external.url : page.cover?.file.url,
 		icon: {

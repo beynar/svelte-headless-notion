@@ -29,15 +29,23 @@
 	</div>
 {/snippet}
 
-{#snippet defaultHeading(arg: any)}
+{#snippet defaultHeading1(arg: any)}
 	<div style={c(arg.block)} data-sn-heading>
-		{#if arg.block.level === 1}
-			<h1>{@render arg.content()}</h1>
-		{:else if arg.block.level === 2}
-			<h2>{@render arg.content()}</h2>
-		{:else}
-			<h3>{@render arg.content()}</h3>
-		{/if}
+		<h1>{@render arg.content()}</h1>
+		{@render arg.children()}
+	</div>
+{/snippet}
+
+{#snippet defaultHeading2(arg: any)}
+	<div style={c(arg.block)} data-sn-heading>
+		<h2>{@render arg.content()}</h2>
+		{@render arg.children()}
+	</div>
+{/snippet}
+<!--  -->
+{#snippet defaultHeading3(arg: any)}
+	<div style={c(arg.block)} data-sn-heading>
+		<h3>{@render arg.content()}</h3>
 		{@render arg.children()}
 	</div>
 {/snippet}
@@ -198,8 +206,8 @@
 {#snippet defaultColumnList(arg: any)}
 	<div
 		data-sn-column-list
-		style="display: grid; grid-template-columns: repeat({arg.children.length +
-			1}, minmax(0, 1fr)); gap: 1rem"
+		style="display: grid; grid-template-columns: repeat({arg.blocks.children
+			.length}, minmax(0, 1fr)); gap: 1rem"
 	>
 		{@render arg.children()}
 	</div>
@@ -240,7 +248,9 @@
 
 {#snippet defaultTable(arg: any)}
 	<table data-sn-table>
-		{@render arg.children()}
+		<tbody>
+			{@render arg.children()}
+		</tbody>
 	</table>
 {/snippet}
 
@@ -251,15 +261,9 @@
 {/snippet}
 
 {#snippet defaultTableCell(arg: any)}
-	<td data-sn-table-cell>
+	<svelte:element this={arg.block.isHeader ? 'th' : 'td'} data-sn-table-cell>
 		{@render arg.content()}
-	</td>
-{/snippet}
-
-{#snippet defaultUnsupported(arg: any)}
-	<div data-sn-unsupported>
-		<!--  -->
-	</div>
+	</svelte:element>
 {/snippet}
 
 {#each blocks as block, i}
@@ -285,8 +289,12 @@
 
 	{#if block.type === 'paragraph'}
 		{@render (page.snippets?.paragraph || defaultParagraph)({ block, content, children })}
-	{:else if block.type === 'heading'}
-		{@render (page.snippets?.heading || defaultHeading)({ block, content, children })}
+	{:else if block.type === 'heading_1'}
+		{@render (page.snippets?.heading_1 || defaultHeading1)({ block, content, children })}
+	{:else if block.type === 'heading_2'}
+		{@render (page.snippets?.heading_2 || defaultHeading2)({ block, content, children })}
+	{:else if block.type === 'heading_3'}
+		{@render (page.snippets?.heading_3 || defaultHeading3)({ block, content, children })}
 	{:else if block.type === 'bulleted_list_item'}
 		{@render (page.snippets?.bulleted_list_item || defaultBulletedListItem)({
 			block,
@@ -354,6 +362,6 @@
 	{:else if block.type === 'table_cell'}
 		{@render (page.snippets?.table_cell || defaultTableCell)({ block, content })}
 	{:else}
-		{@render (page.snippets?.unsupported || defaultUnsupported)({ block })}
+		<!-- UNSUPPORTED BLOCK -->
 	{/if}
 {/each}
