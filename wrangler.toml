@@ -1,0 +1,5 @@
+name = "svelte-notion"
+compatibility_date = "2024-06-03"
+[[kv_namespaces]]
+binding = "SVELTE_NOTION"
+id = "858a8aa9c53749ee95e3c33e9b104b03"

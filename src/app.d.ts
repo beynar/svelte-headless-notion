@@ -1,5 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
+
 declare global {
 	namespace App {
 		// interface Error {}
@@ -8,9 +9,12 @@ declare global {
 		// interface PageState {}
 		interface Platform {
 			caches: {
-				default: Cache;
+				default: import('@cloudflare/workers-types').Cache;
 			};
-			context: ExecutionContext;
+			env: {
+				SVELTE_NOTION: import('@cloudflare/workers-types').KVNamespace;
+			};
+			context: import('@cloudflare/workers-types').ExecutionContext;
 		}
 	}
 }

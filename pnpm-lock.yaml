@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@cloudflare/workers-types':
+    specifier: ^4.20240925.0
+    version: 4.20240925.0
   '@notionhq/client':
     specifier: ^2.2.15
     version: 2.2.15
@@ -880,7 +883,7 @@ packages:
       '@sveltejs/kit': 2.5.28(@sveltejs/vite-plugin-svelte@4.0.0-next.7)(svelte@5.0.0-next.259)(vite@5.4.8)
       esbuild: 0.21.5
       worktop: 0.8.0-next.18
-      wrangler: 3.78.10
+      wrangler: 3.78.10(@cloudflare/workers-types@4.20240925.0)
     dev: true
 
   /@sveltejs/kit@2.5.28(@sveltejs/vite-plugin-svelte@4.0.0-next.7)(svelte@5.0.0-next.259)(vite@5.4.8):
@@ -3012,7 +3015,7 @@ packages:
       regexparam: 3.0.0
     dev: true
 
-  /wrangler@3.78.10:
+  /wrangler@3.78.10(@cloudflare/workers-types@4.20240925.0):
     resolution: {integrity: sha512-Q8Ia0xz0RCzj5X7TMIEQ/EbADSG2cWPmTDRaulGSWnYqfIlFyKoxl7Zx1XXCo1EkDcKfSpX6TZa22pCDmtl4LA==}
     engines: {node: '>=16.17.0'}
     hasBin: true
@@ -3024,6 +3027,7 @@ packages:
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@cloudflare/workers-shared': 0.5.4
+      '@cloudflare/workers-types': 4.20240925.0
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
       '@esbuild-plugins/node-modules-polyfill': 0.2.2(esbuild@0.17.19)
       blake3-wasm: 2.1.5
