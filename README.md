@@ -16,7 +16,7 @@ npm install svelte-headless-notion
 
 ## Documentation
 
-=> [Here](https://svelte-notion.vercel.app/docs/getting-started/installation)
+=> [Here](https://svelte-headless-notion.pages.dev)
 
 ## Prerequisites
 
