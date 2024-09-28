@@ -16,7 +16,7 @@ npm install svelte-headless-notion
 
 ## Documentation and example
 
-The documentation [Here](https://svelte-headless-notion.pages.dev) is a notion page itself rendered with this librairie. The source code of this page is [Here](https://github.com/beynar/svelte-headless-notion/blob/master/src/routes/%2Bpage.svelte)
+The documentation [here](https://svelte-headless-notion.pages.dev) is a notion page itself rendered with this librairy. The source code of this page is [here](https://github.com/beynar/svelte-headless-notion/blob/master/src/routes/%2Bpage.svelte)
 
 ## Prerequisites
 

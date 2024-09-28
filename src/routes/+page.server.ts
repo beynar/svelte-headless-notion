@@ -10,8 +10,6 @@ const getFromOrigin = () => {
 		id: pageId
 	});
 };
-import { Client } from '@notionhq/client';
-const notion = new Client({ auth: PRIVATE_NOTION_TOKEN });
 
 // const res = await notion.databases.retrieve({ database_id: pageId });
 const setInCache = (platform: App.Platform, page: PageWithBlocks) => {
@@ -37,7 +35,7 @@ export async function load({ platform }) {
 	const isStale = cachedValue && (cachedValue.metadata?.expiration || Infinity) < Date.now();
 
 	const page = cachedValue?.value || (await getFromOrigin());
-
+	console.log(isStale, !!cachedValue?.value);
 	if (isStale || !cachedValue?.value) {
 		platform?.context.waitUntil(setInCache(platform, page));
 	}
