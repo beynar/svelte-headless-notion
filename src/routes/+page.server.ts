@@ -11,11 +11,9 @@ const getFromOrigin = () => {
 	});
 };
 
-// const res = await notion.databases.retrieve({ database_id: pageId });
-const setInCache = (platform: App.Platform, page: PageWithBlocks) => {
-	return platform.env.SVELTE_NOTION.put(pageId, JSON.stringify(page), {
+const setInCache = async (platform: App.Platform) => {
+	return platform.env.SVELTE_NOTION.put(pageId, JSON.stringify(await getFromOrigin()), {
 		metadata: {
-			// One minute
 			expiration: Date.now() + 1000 * 60
 		}
 	});
@@ -35,9 +33,8 @@ export async function load({ platform }) {
 	const isStale = cachedValue && (cachedValue.metadata?.expiration || Infinity) < Date.now();
 
 	const page = cachedValue?.value || (await getFromOrigin());
-	console.log(isStale, !!cachedValue?.value);
 	if (isStale || !cachedValue?.value) {
-		platform?.context.waitUntil(setInCache(platform, page));
+		platform?.context.waitUntil(setInCache(platform));
 	}
 
 	return {
