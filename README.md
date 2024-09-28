@@ -1,13 +1,22 @@
 # Svelte-notion
 
-Headless Notion for Svelte.
+Headless Notion page rendering engine for Svelte.
 Simply fetch a page and render it as you want with snippets.
+Lightweight, fully typed and no runtime dependencies.
 
 ## Install
 
 ```bash
+pnpm add svelte-headless-notion
+```
+
+```bash
 npm install svelte-headless-notion
 ```
+
+## Documentation
+
+=> [Here](https://svelte-notion.vercel.app/docs/getting-started/installation)
 
 ## Prerequisites
 
@@ -41,6 +50,7 @@ export const load = async () => {
 </script>
 
 <Page page={data.data}>
+	<!-- Example snippet to render a paragraph block -->
 	{#snippet paragraph({ block, children, content })}
 		<div>
 			<p>
@@ -49,7 +59,7 @@ export const load = async () => {
 			{@render children()}
 		</div>
 	{/snippet}
-	<!-- Define other block snippet here -->
+	<!-- Define other block snippet here (callout, image, pdf, child_database, etc...) -->
 </Page>
 ```
 
