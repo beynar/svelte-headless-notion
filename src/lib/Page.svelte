@@ -159,7 +159,7 @@
 	};
 
 	export const getPageContext = () => {
-		return getContext<PageContext>('page');
+		return getContext<PageContext | undefined>('page') || null;
 	};
 </script>
 
@@ -173,29 +173,44 @@
 		header,
 		footer,
 		page,
+		wrapper,
 		...snippets
 	}: {
 		class?: string;
 		as?: string;
-		header?: Snippet<[{ page: PageWithBlocks }]>;
-		footer?: Snippet<[{ page: PageWithBlocks }]>;
+		header?: Snippet<[{ page: PageWithBlocks; title: Snippet }]>;
+		footer?: Snippet<[{ page: PageWithBlocks; title: Snippet }]>;
 		page: PageWithBlocks;
+		wrapper?: Snippet<[{ children: Snippet }]>;
 	} & PageSnippets = $props();
 
 	registerPage({ page, snippets });
 </script>
 
+{#snippet children()}
+	<Blocks blocks={page.blocks} />
+{/snippet}
+<!-- {@render title()} -->
+{#snippet title()}
+	<Text content={page.title} />
+{/snippet}
+
 <svelte:element this={as} data-sn-page class={className}>
 	{#if header}
-		{@render header({ page })}
+		{@render header({ page, title })}
 	{:else}
 		<img src={page.cover} alt="" style="width: 100%; height: 300px; object-fit: cover;" />
 		<h1 data-sn-page-title>
-			<Text content={page.title} />
+			{@render title()}
 		</h1>
 	{/if}
-	<Blocks blocks={page.blocks} />
+
+	{#if wrapper}
+		{@render wrapper({ children })}
+	{:else}
+		{@render children()}
+	{/if}
 	{#if footer}
-		{@render footer({ page })}
+		{@render footer({ page, title })}
 	{/if}
 </svelte:element>

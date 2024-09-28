@@ -98,7 +98,7 @@
 
 {#snippet defaultCallout(arg: any)}
 	<div style={c(arg.block)} data-sn-callout>
-		<div>{arg.block.icon} {@render arg.content()}</div>
+		<div>{@render arg.content()}</div>
 		<div>
 			{@render arg.children()}
 		</div>
@@ -206,7 +206,7 @@
 {#snippet defaultColumnList(arg: any)}
 	<div
 		data-sn-column-list
-		style="display: grid; grid-template-columns: repeat({arg.blocks.children
+		style="display: grid; grid-template-columns: repeat({arg.block.children
 			.length}, minmax(0, 1fr)); gap: 1rem"
 	>
 		{@render arg.children()}
@@ -288,79 +288,79 @@
 	{/snippet}
 
 	{#if block.type === 'paragraph'}
-		{@render (page.snippets?.paragraph || defaultParagraph)({ block, content, children })}
+		{@render (page?.snippets?.paragraph || defaultParagraph)({ block, content, children })}
 	{:else if block.type === 'heading_1'}
-		{@render (page.snippets?.heading_1 || defaultHeading1)({ block, content, children })}
+		{@render (page?.snippets?.heading_1 || defaultHeading1)({ block, content, children })}
 	{:else if block.type === 'heading_2'}
-		{@render (page.snippets?.heading_2 || defaultHeading2)({ block, content, children })}
+		{@render (page?.snippets?.heading_2 || defaultHeading2)({ block, content, children })}
 	{:else if block.type === 'heading_3'}
-		{@render (page.snippets?.heading_3 || defaultHeading3)({ block, content, children })}
+		{@render (page?.snippets?.heading_3 || defaultHeading3)({ block, content, children })}
 	{:else if block.type === 'bulleted_list_item'}
-		{@render (page.snippets?.bulleted_list_item || defaultBulletedListItem)({
+		{@render (page?.snippets?.bulleted_list_item || defaultBulletedListItem)({
 			block,
 			content,
 			children
 		})}
 	{:else if block.type === 'numbered_list_item'}
-		{@render (page.snippets?.numbered_list_item || defaultNumberedListItem)({
+		{@render (page?.snippets?.numbered_list_item || defaultNumberedListItem)({
 			block,
 			content,
 			children
 		})}
 	{:else if block.type === 'to_do'}
-		{@render (page.snippets?.to_do || defaultToDo)({ block, content, children })}
+		{@render (page?.snippets?.to_do || defaultToDo)({ block, content, children })}
 	{:else if block.type === 'toggle'}
-		{@render (page.snippets?.toggle || defaultToggle)({ block, content, children })}
+		{@render (page?.snippets?.toggle || defaultToggle)({ block, content, children })}
 	{:else if block.type === 'code'}
-		{@render (page.snippets?.code || defaultCode)({ block, content, children, caption })}
+		{@render (page?.snippets?.code || defaultCode)({ block, content, children, caption })}
 	{:else if block.type === 'callout'}
-		{@render (page.snippets?.callout || defaultCallout)({ block, content, children })}
+		{@render (page?.snippets?.callout || defaultCallout)({ block, content, children })}
 	{:else if block.type === 'quote'}
-		{@render (page.snippets?.quote || defaultQuote)({ block, content, children })}
+		{@render (page?.snippets?.quote || defaultQuote)({ block, content, children })}
 	{:else if block.type === 'image'}
-		{@render (page.snippets?.image || defaultImage)({ block, caption })}
+		{@render (page?.snippets?.image || defaultImage)({ block, caption })}
 	{:else if block.type === 'divider'}
-		{@render (page.snippets?.divider || defaultDivider)({ block })}
+		{@render (page?.snippets?.divider || defaultDivider)({ block })}
 	{:else if block.type === 'equation'}
-		{@render (page.snippets?.equation || defaultEquation)({ block })}
+		{@render (page?.snippets?.equation || defaultEquation)({ block })}
 	{:else if block.type === 'child_page'}
-		{@render (page.snippets?.child_page || defaultChildPage)({ block })}
+		{@render (page?.snippets?.child_page || defaultChildPage)({ block })}
 	{:else if block.type === 'child_database'}
-		{@render (page.snippets?.child_database || defaultChildDatabase)({ block })}
+		{@render (page?.snippets?.child_database || defaultChildDatabase)({ block })}
 	{:else if block.type === 'embed'}
-		{@render (page.snippets?.embed || defaultEmbed)({ block, caption })}
+		{@render (page?.snippets?.embed || defaultEmbed)({ block, caption })}
 	{:else if block.type === 'video'}
-		{@render (page.snippets?.video || defaultVideo)({ block, caption })}
+		{@render (page?.snippets?.video || defaultVideo)({ block, caption })}
 	{:else if block.type === 'file'}
-		{@render (page.snippets?.file || defaultFile)({ block, caption })}
+		{@render (page?.snippets?.file || defaultFile)({ block, caption })}
 	{:else if block.type === 'pdf'}
-		{@render (page.snippets?.pdf || defaultPdf)({ block, caption })}
+		{@render (page?.snippets?.pdf || defaultPdf)({ block, caption })}
 	{:else if block.type === 'bookmark'}
-		{@render (page.snippets?.bookmark || defaultBookmark)({ block, caption })}
+		{@render (page?.snippets?.bookmark || defaultBookmark)({ block, caption })}
 	{:else if block.type === 'table_of_contents'}
-		{@render (page.snippets?.table_of_contents || defaultTableOfContents)({ block })}
+		{@render (page?.snippets?.table_of_contents || defaultTableOfContents)({ block })}
 	{:else if block.type === 'breadcrumb'}
-		{@render (page.snippets?.breadcrumb || defaultBreadcrumb)({ block })}
+		{@render (page?.snippets?.breadcrumb || defaultBreadcrumb)({ block })}
 	{:else if block.type === 'column_list'}
-		{@render (page.snippets?.column_list || defaultColumnList)({ block, children })}
+		{@render (page?.snippets?.column_list || defaultColumnList)({ block, children })}
 	{:else if block.type === 'column'}
-		{@render (page.snippets?.column || defaultColumn)({ block, children })}
+		{@render (page?.snippets?.column || defaultColumn)({ block, children })}
 	{:else if block.type === 'synced_block'}
-		{@render (page.snippets?.synced_block || defaultSyncedBlock)({ block, children })}
+		{@render (page?.snippets?.synced_block || defaultSyncedBlock)({ block, children })}
 	{:else if block.type === 'template'}
-		{@render (page.snippets?.template || defaultTemplate)({ block, content, children })}
+		{@render (page?.snippets?.template || defaultTemplate)({ block, content, children })}
 	{:else if block.type === 'link_to_page'}
-		{@render (page.snippets?.link_to_page || defaultLinkToPage)({ block })}
+		{@render (page?.snippets?.link_to_page || defaultLinkToPage)({ block })}
 	{:else if block.type === 'table'}
-		{@render (page.snippets?.table || defaultTable)({ block, children })}
+		{@render (page?.snippets?.table || defaultTable)({ block, children })}
 	{:else if block.type === 'table_row'}
-		{@render (page.snippets?.table_row || defaultTableRow)({ block, children })}
+		{@render (page?.snippets?.table_row || defaultTableRow)({ block, children })}
 	{:else if block.type === 'link_preview'}
-		{@render (page.snippets?.link_preview || defaultLinkPreview)({ block })}
+		{@render (page?.snippets?.link_preview || defaultLinkPreview)({ block })}
 	{:else if block.type === 'audio'}
-		{@render (page.snippets?.audio || defaultAudio)({ block, caption })}
+		{@render (page?.snippets?.audio || defaultAudio)({ block, caption })}
 	{:else if block.type === 'table_cell'}
-		{@render (page.snippets?.table_cell || defaultTableCell)({ block, content })}
+		{@render (page?.snippets?.table_cell || defaultTableCell)({ block, content })}
 	{:else}
 		<!-- UNSUPPORTED BLOCK -->
 	{/if}

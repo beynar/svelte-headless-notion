@@ -8,7 +8,6 @@
 	}: {
 		content: RichText;
 	} = $props();
-
 	const page = getPageContext();
 </script>
 
@@ -34,7 +33,7 @@
 
 {#snippet defaultMention({ block, children }: { block: Mention; children: Snippet })}
 	<span data-sn-mention>
-		@{@render children()}
+		{@render children()}
 	</span>
 {/snippet}
 
@@ -49,9 +48,9 @@
 			{#if textPart.type === 'text'}
 				{@render children()}
 			{:else if textPart.type === 'link'}
-				{@render (page.snippets.link || defaultLink)({ block: textPart, children })}
+				{@render (page?.snippets.link || defaultLink)({ block: textPart, children })}
 			{:else if textPart.type === 'mention'}
-				{@render (page.snippets.mention || defaultMention)({ block: textPart, children })}
+				{@render (page?.snippets.mention || defaultMention)({ block: textPart, children })}
 			{/if}
 		{/if}
 	{/each}

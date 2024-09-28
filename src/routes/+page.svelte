@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import '../app.css';
-	import Page from '$lib/Page.svelte';
 	import Text from '$lib/Text.svelte';
+	import Page from '$lib/Page.svelte';
 
 	let { data } = $props();
 
@@ -22,24 +22,34 @@
 	};
 </script>
 
-<Page page={data.page} class="prose mx-auto !max-w-screen-lg px-2 py-20">
+<Page page={data.page} class="">
 	{#snippet header({ page })}
 		<div class="grid content-center mb-10">
 			<img
 				style="grid-area: 1 / 1"
 				src={page.cover}
 				alt=""
-				class="aspect-video w-full h-[220px] rounded m-0"
+				class="aspect-video w-full h-[220px] m-0"
 			/>
 			<div
 				style="grid-area: 1 / 1"
-				class="grid content-center text-center bg-slate-600 bg-blend-color-dodge bg-opacity-10"
+				class="grid text-4xl font-sans font-bold content-center text-center bg-slate-600 bg-blend-color-dodge bg-opacity-10"
 			>
 				<h1 class="w-full h-full text-white m-0">
 					<Text content={page.title} />
 				</h1>
 			</div>
 		</div>
+	{/snippet}
+	{#snippet wrapper({ children })}
+		<div class="prose mx-auto !max-w-screen-lg px-2 py-20">
+			{@render children()}
+		</div>
+	{/snippet}
+	{#snippet inlineCode({ children })}
+		<kbd>
+			{@render children()}
+		</kbd>
 	{/snippet}
 	{#snippet code({ content, block })}
 		<pre class="no-prose" use:hightlight={block.language}><code class="language-html"

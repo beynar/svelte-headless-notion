@@ -108,7 +108,7 @@ export const sanitizeRichText = (richtext: RichTextItemResponse[]): RichText => 
 					// @ts-ignore
 					start: item.mention.date?.start,
 					// @ts-ignore
-					end: item.mention.date.end,
+					end: item.mention.date?.end,
 					// @ts-ignore
 					url: item.mention.url
 				},

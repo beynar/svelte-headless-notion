@@ -10,11 +10,15 @@ const getFromOrigin = () => {
 		id: pageId
 	});
 };
+import { Client } from '@notionhq/client';
+const notion = new Client({ auth: PRIVATE_NOTION_TOKEN });
 
+// const res = await notion.databases.retrieve({ database_id: pageId });
 const setInCache = (platform: App.Platform, page: PageWithBlocks) => {
 	return platform.env.SVELTE_NOTION.put(pageId, JSON.stringify(page), {
 		metadata: {
-			expiration: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
+			// One minute
+			expiration: Date.now() + 1000 * 60
 		}
 	});
 };

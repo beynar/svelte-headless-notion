@@ -37,9 +37,9 @@
 	</u>
 {/snippet}
 {#snippet defaultInlineCode(arg: any)}
-	<u>
+	<code>
 		{@render arg.children()}
-	</u>
+	</code>
 {/snippet}
 {#snippet defaultColor(arg: any)}
 	<span style="color: var(--notion-{arg.color})">
@@ -56,15 +56,15 @@
 {/snippet}
 
 {#if mark.bold}
-	{@render (page.snippets.bold || defaultBold)({ children })}
+	{@render (page?.snippets.bold || defaultBold)({ children })}
 {:else if mark.italic}
-	{@render (page.snippets.italic || defaultItalic)({ children })}
+	{@render (page?.snippets.italic || defaultItalic)({ children })}
 {:else if mark.strikethrough}
-	{@render (page.snippets.strikethrough || defaultStrikethrough)({ children })}
+	{@render (page?.snippets.strikethrough || defaultStrikethrough)({ children })}
 {:else if mark.underline}
-	{@render (page.snippets.underline || defaultUnderline)({ children })}
+	{@render (page?.snippets.underline || defaultUnderline)({ children })}
 {:else if mark.code}
-	{@render (page.snippets.inlineCode || defaultInlineCode)({ children })}
+	{@render (page?.snippets.inlineCode || defaultInlineCode)({ children })}
 {:else if mark.color}
-	{@render (page.snippets.color || defaultColor)({ children, color: mark.color })}
+	{@render (page?.snippets.color || defaultColor)({ children, color: mark.color })}
 {/if}

@@ -2,6 +2,7 @@ import { type Block, type RawBlock, sanitizeBlocks } from './block.js';
 
 import type {
 	BlockObjectResponse,
+	DatabaseObjectResponse,
 	PageObjectResponse,
 	QueryDatabaseParameters,
 	UserObjectResponse
@@ -36,6 +37,26 @@ export class Notion {
 					if (block.type === 'child_database') {
 						const pages = await this.getDatabasePages(block.id);
 						return Object.assign(block, { pages });
+					}
+					if (block.type === 'child_page') {
+						const page = await this.getPage(block.id);
+						return Object.assign(block, { page });
+					}
+					if (block.type === 'link_to_page') {
+						if (block.link_to_page.type === 'page_id') {
+							const page = await this.getPage(block.link_to_page.page_id);
+							return Object.assign(block, { page });
+						} else if (block.link_to_page.type === 'database_id') {
+							const database = await this.getDatabase(block.link_to_page.database_id);
+							return Object.assign(block, { page: database });
+						} else {
+							return block;
+						}
+					}
+
+					if (block.type === 'synced_block' && block.synced_block.synced_from?.block_id) {
+						const children = await this.getRecursiveBlocks(block.synced_block.synced_from.block_id);
+						return Object.assign(block, { children });
 					}
 
 					if (block.has_children) {
@@ -85,7 +106,14 @@ export class Notion {
 		return fetch(`https://api.notion.com/v1/pages/${block_id}`, {
 			headers: this.headers
 		}).then((response) =>
-			response.json().then((data) => sanitizePageProperties(data as PageObjectResponse, this))
+			response.json().then((data: PageObjectResponse) => sanitizePageProperties(data, this))
+		);
+	};
+	getDatabase = async (block_id: string) => {
+		return fetch(`https://api.notion.com/v1/pages/${block_id}`, {
+			headers: this.headers
+		}).then((response) =>
+			response.json().then((data: PageObjectResponse) => sanitizePageProperties(data, this))
 		);
 	};
 }

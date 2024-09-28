@@ -1,6 +1,9 @@
 import type {
+	DatabaseObjectResponse,
 	FormulaPropertyItemObjectResponse,
-	PageObjectResponse
+	GetDatabaseResponse,
+	PageObjectResponse,
+	UserObjectResponse
 } from '@notionhq/client/build/src/api-endpoints.js';
 import { sanitizeRichText, type RichText } from './richtext.js';
 import type { Notion } from './server.js';
@@ -74,11 +77,11 @@ type MultiSelect = BaseProperty<
 	}
 >;
 
-type Date = BaseProperty<
+type DateProperty = BaseProperty<
 	'date',
 	{
-		start?: string;
-		end?: string | null;
+		start: Date | null;
+		end: Date | null;
 		time_zone?: string | null;
 	}
 >;
@@ -86,15 +89,7 @@ type Date = BaseProperty<
 type People = BaseProperty<
 	'people',
 	{
-		peoples: Array<{
-			id: string;
-			// name: string;
-			// avatar_url: string | null;
-			// type: 'person' | 'bot';
-			// person?: {
-			// 	email: string;
-			// };
-		}>;
+		peoples: User[];
 	}
 >;
 
@@ -156,14 +151,14 @@ type Rollup = BaseProperty<
 type CreatedTime = BaseProperty<
 	'created_time',
 	{
-		date: string;
+		date: Date;
 	}
 >;
 
 type LastEditedTime = BaseProperty<
 	'last_edited_time',
 	{
-		date: string;
+		date: Date;
 	}
 >;
 
@@ -182,7 +177,7 @@ export type Property =
 	| Number
 	| Select
 	| MultiSelect
-	| Date
+	| DateProperty
 	| People
 	| Files
 	| Checkbox
@@ -202,15 +197,26 @@ export type Properties = Property[];
 export type PageWithProperties = {
 	id: string;
 	title: RichText;
+	createdBy: User;
+	lastEditedBy: User;
 	cover?: string;
 	icon?: {
 		type?: string;
 		value?: string;
 	};
-	created_time: string;
-	last_edited_time: string;
+	created_time: Date;
+	last_edited_time: Date;
 	parent: string;
-	properties: Properties;
+	properties: Map<string, Property>;
+};
+
+const sanitizeUser = (user: User) => {
+	return {
+		id: user.id,
+		name: user.name,
+		avatar_url: user.avatar_url,
+		type: user.type
+	};
 };
 
 export const sanitizePageProperties = async (
@@ -218,6 +224,10 @@ export const sanitizePageProperties = async (
 	notion: Notion
 ): Promise<PageWithProperties> => {
 	const entries = Object.entries(page.properties);
+	const [createdBy, lastEditedBy] = await Promise.all([
+		notion.getUser(page.created_by.id),
+		notion.getUser(page.last_edited_by.id)
+	]);
 	const properties = await Promise.all(
 		entries.map(async ([key, value]): Promise<Property> => {
 			switch (value.type) {
@@ -264,24 +274,20 @@ export const sanitizePageProperties = async (
 				case 'date':
 					return {
 						type: 'date',
-						start: value.date?.start,
-						end: value.date?.end,
+						start: new Date(value.date?.start || '') || null,
+						end: new Date(value.date?.end || '') || null,
 						time_zone: value.date?.time_zone,
 						title: key
 					};
 
-				case 'people':
+				case 'people': {
+					const users = await Promise.all(value.people.map((person) => notion.getUser(person.id)));
 					return {
 						type: 'people',
-						peoples: value.people.map((person) => ({
-							id: person.id
-							// name: person.,
-							// avatar_url: person.avatar_url,
-							// type: person.type,
-							// person: person.person
-						})),
+						peoples: users.map(sanitizeUser),
 						title: key
 					};
+				}
 
 				case 'files':
 					return {
@@ -347,7 +353,7 @@ export const sanitizePageProperties = async (
 				case 'created_time':
 					return {
 						type: 'created_time',
-						date: value.created_time,
+						date: new Date(value.created_time),
 						title: key
 					};
 
@@ -368,7 +374,7 @@ export const sanitizePageProperties = async (
 				case 'last_edited_time':
 					return {
 						type: 'last_edited_time',
-						date: value.last_edited_time,
+						date: new Date(value.last_edited_time),
 						title: key
 					};
 
@@ -376,12 +382,7 @@ export const sanitizePageProperties = async (
 					const user = await notion.getUser(value.id);
 					return {
 						type: 'last_edited_by',
-						user: {
-							id: user.id,
-							name: user.name,
-							avatar_url: user.avatar_url,
-							type: user.type
-						},
+						user: sanitizeUser(user),
 						title: key
 					};
 			}
@@ -390,21 +391,27 @@ export const sanitizePageProperties = async (
 
 	return {
 		id: page.id,
+		createdBy: sanitizeUser(createdBy),
+		lastEditedBy: sanitizeUser(lastEditedBy),
 		title: properties.find((property) => property.type === 'title')!.content,
 		cover: page.cover?.type === 'external' ? page.cover.external.url : page.cover?.file.url,
-		icon: {
-			type: page.icon?.type,
-			value:
-				page.icon?.type === 'emoji'
-					? page.icon.emoji
-					: page.icon?.type === 'external'
-						? page.icon.external.url
-						: page.icon?.file.url
-		},
-		created_time: page.created_time,
-		last_edited_time: page.last_edited_time,
+		icon: page.icon?.type
+			? {
+					type: page.icon?.type,
+					value:
+						page.icon?.type === 'emoji'
+							? page.icon.emoji
+							: page.icon?.type === 'external'
+								? page.icon.external.url
+								: page.icon?.file.url
+				}
+			: undefined,
+		created_time: new Date(page.created_time),
+		last_edited_time: new Date(page.last_edited_time),
 		// @ts-ignore
 		parent: page.parent.page_id || page.parent.database_id || page.parent.block_id || 'workspace',
-		properties
+		properties: new Map(
+			properties.filter((p) => p.title !== 'title').map((property) => [property.title, property])
+		)
 	};
 };

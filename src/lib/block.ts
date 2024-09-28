@@ -1,6 +1,9 @@
 import type {
 	BlockObjectResponse,
+	ChildDatabaseBlockObjectResponse,
+	ChildPageBlockObjectResponse,
 	CodeBlockObjectResponse,
+	LinkToPageBlockObjectResponse,
 	TableBlockObjectResponse
 } from '@notionhq/client/build/src/api-endpoints.js';
 import { sanitizeRichText, type RichText } from './richtext.js';
@@ -149,7 +152,7 @@ export type TemplateBlock = {
 export type LinkToPageBlock = {
 	type: 'link_to_page';
 	linkType: 'page_id' | 'database_id' | 'comment_id';
-	id?: string;
+	page?: PageWithProperties;
 };
 
 export type TableBlock = {
@@ -183,7 +186,7 @@ export type UnsupportedBlock = {
 
 export type ChildPageBlock = {
 	type: 'child_page';
-	title: string;
+	page: PageWithProperties;
 };
 export type ChildDatabaseBlock = {
 	type: 'child_database';
@@ -226,8 +229,16 @@ export type Block =
 	| LinkPreviewBlock
 	| AudioBlock;
 
-export type RawBlock = BlockObjectResponse &
-	({ children: RawBlock[] } | { type: 'child_database'; pages: PageWithProperties[] });
+export type RawBlock =
+	| (Exclude<
+			BlockObjectResponse,
+			| ChildPageBlockObjectResponse
+			| ChildDatabaseBlockObjectResponse
+			| LinkToPageBlockObjectResponse
+	  > & { children: RawBlock[] })
+	| (ChildPageBlockObjectResponse & { page: PageWithProperties })
+	| (ChildDatabaseBlockObjectResponse & { pages: PageWithProperties[] })
+	| (LinkToPageBlockObjectResponse & { page?: PageWithProperties });
 
 const removeColor = (block: Block) => {
 	if ('color' in block && block.color === 'default') {
@@ -235,8 +246,7 @@ const removeColor = (block: Block) => {
 	}
 	return block;
 };
-type o = RawBlock['type'];
-//
+
 const extractBlock = (block: RawBlock, parent?: RawBlock, blockIndex?: number): Block => {
 	switch (block.type) {
 		default: {
@@ -423,6 +433,7 @@ const extractBlock = (block: RawBlock, parent?: RawBlock, blockIndex?: number): 
 		case 'synced_block': {
 			return {
 				type: 'synced_block',
+				synced_from: block.synced_block.synced_from?.block_id,
 				children: sanitizeBlocks(block.children)
 			} satisfies SyncedBlock;
 		}
@@ -475,26 +486,20 @@ const extractBlock = (block: RawBlock, parent?: RawBlock, blockIndex?: number): 
 			return {
 				type: 'link_to_page',
 				linkType: block.link_to_page.type,
-				id:
-					block.link_to_page.type === 'comment_id'
-						? block.link_to_page.comment_id
-						: block.link_to_page.type === 'database_id'
-							? block.link_to_page.database_id
-							: block.link_to_page.page_id
+				page: block.page
 			} satisfies LinkToPageBlock;
 		}
 		case 'child_database': {
 			return {
 				type: 'child_database',
 				title: block.child_database.title,
-				// @ts-ignore
 				pages: block.pages
 			} satisfies ChildDatabaseBlock;
 		}
 		case 'child_page': {
 			return {
 				type: 'child_page',
-				title: block.child_page.title
+				page: block.page
 			} satisfies ChildPageBlock;
 		}
 		case 'unsupported': {
