@@ -205,9 +205,9 @@
 
 {#snippet defaultColumnList(arg: any)}
 	<div
-		data-sn-column-list
-		style="display: grid; grid-template-columns: repeat({arg.block.children
-			.length}, minmax(0, 1fr)); gap: 1rem"
+		style:--size={arg.block.children.length}
+		data-sn-column-list={arg.block.children.length}
+		style="display: grid; gap: 1rem"
 	>
 		{@render arg.children()}
 	</div>
@@ -365,3 +365,20 @@
 		<!-- UNSUPPORTED BLOCK -->
 	{/if}
 {/each}
+
+<style>
+	[data-sn-column-list] {
+		grid-template-columns: repeat(var(--size), minmax(0, 1fr));
+	}
+	@media (max-width: 768px) {
+		[data-sn-column-list] {
+			grid-template-columns: repeat(round(down, calc(var(--size) / 2)), minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 480px) {
+		[data-sn-column-list] {
+			grid-template-columns: repeat(1, minmax(0, 1fr));
+		}
+	}
+</style>
