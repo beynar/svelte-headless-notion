@@ -11,18 +11,15 @@ import { sanitizePageProperties, type PageWithProperties } from './properties.js
 
 export type PageWithBlocks = PageWithProperties & { blocks: Block[] };
 export class Notion {
-	auth: string;
 	headers: Record<string, string>;
 	constructor(auth: string) {
-		this.auth = auth;
 		this.headers = {
-			Authorization: `Bearer ${this.auth}`,
+			Authorization: `Bearer ${auth}`,
 			'Notion-Version': '2022-06-28'
 		};
 	}
 	listBlocks = async (block_id: string) => {
-		const url = `https://api.notion.com/v1/blocks/${block_id}/children?page_size=200`;
-		return fetch(url, {
+		return fetch(`https://api.notion.com/v1/blocks/${block_id}/children?page_size=200`, {
 			headers: this.headers
 		}).then((response) => response.json().then((data) => data.results as BlockObjectResponse[]));
 	};
@@ -75,7 +72,11 @@ export class Notion {
 		return this.getRecursiveBlocks(block_id).then(sanitizeBlocks);
 	};
 
-	getDatabasePages = (database_id: string, filter?: QueryDatabaseParameters['filter']) => {
+	getDatabasePages = (
+		database_id: string,
+		filter?: QueryDatabaseParameters['filter'],
+		page_size = 100
+	) => {
 		return fetch(`https://api.notion.com/v1/databases/${database_id}/query`, {
 			method: 'POST',
 			headers: Object.assign(
@@ -85,7 +86,7 @@ export class Notion {
 				this.headers
 			),
 			body: JSON.stringify({
-				page_size: 100,
+				page_size,
 				filter
 			})
 		}).then((response) => {
@@ -138,9 +139,9 @@ export const findPage = async ({
 	auth: string;
 	database_id: string;
 	filter?: QueryDatabaseParameters['filter'];
-}) => {
+}): Promise<PageWithBlocks | null> => {
 	const notion = new Notion(auth);
-	const [page] = (await notion.getDatabasePages(database_id, filter)) || [];
+	const [page] = (await notion.getDatabasePages(database_id, filter, 1)) || [];
 
 	if (!page) {
 		return null;

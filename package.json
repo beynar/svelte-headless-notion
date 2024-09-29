@@ -1,6 +1,6 @@
 {
 	"name": "svelte-headless-notion",
-	"version": "0.0.4",
+	"version": "0.0.6",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -49,12 +49,14 @@
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/package": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
+		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
 		"globals": "^15.0.0",
+		"highlight.js": "^11.10.0",
 		"postcss": "^8.4.47",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
@@ -80,9 +82,5 @@
 			".": "./dist/server.d.ts"
 		}
 	},
-	"type": "module",
-	"dependencies": {
-		"@tailwindcss/typography": "^0.5.15",
-		"highlight.js": "^11.10.0"
-	}
+	"type": "module"
 }
